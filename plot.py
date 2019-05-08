@@ -1,6 +1,4 @@
 import sys
-import serial
-import argparse
 import numpy as np
 import matplotlib.pyplot as pp
 import matplotlib.animation as animation
@@ -12,6 +10,7 @@ from matplotlib.lines import Line2D
 
 
 class LivePlot():
+  blitting = False
   def __init__(self, num_inputs, max_range=100):
     self.fig, self.ax = pp.subplots()
     self.inits = np.zeros(num_inputs)
@@ -19,7 +18,7 @@ class LivePlot():
     self.max_range = max_range
     self.datas = [deque([0 for j in range(max_range)]) for i in range(num_inputs)]
     self.lines = [Line2D(range(len(data)), data) for data in self.datas]
-    self.ax.set_ylim(0, 1)
+    # self.ax.set_ylim(0, 1)
     self.ax.set_xlim(0, max_range)
     for line in self.lines:
       self.ax.add_line(line)
@@ -36,8 +35,12 @@ class LivePlot():
     for i, line in enumerate(self.lines):
       self.lines[i].set_data(range(len(self.datas[i])), self.datas[i])
 
-    # self.ax.relim()
-    # self.ax.autoscale_view(tight=True)
+    if t % 50 == 0:
+      blitting = True
+    if t % 50 == 1:
+      blititng = False
+    self.ax.relim()
+    self.ax.autoscale_view(tight=True)
     
     return self.lines
 
@@ -52,7 +55,8 @@ def get_val(vals):
 line = sys.stdin.readline()
 data = [float(val) for val in line.split()]
 num_inputs = len(data)
-print(len(data))
-live_plotter = LivePlot(num_inputs, max_range=500)
-ani = FuncAnimation(live_plotter.fig, live_plotter.update, blit=False, interval=0, frames=None)
+# print(len(data))
+live_plotter = LivePlot(num_inputs)
+ani = FuncAnimation(live_plotter.fig, live_plotter.update,
+                    blit=live_plotter.blitting, interval=0, frames=None)
 pp.show()
