@@ -2,22 +2,26 @@ import sys
 import numpy as np
 import matplotlib.pyplot as pp
 import matplotlib.animation as animation
+import matplotlib._color_data as mcd
 
 from time import sleep
 from collections import deque
 from matplotlib.animation import FuncAnimation
 from matplotlib.lines import Line2D
+from matplotlib import colors as mcolours
 
 
 class LivePlot():
   blitting = False
   def __init__(self, num_inputs, max_range=100):
+    colour_keys = [key for i, key in enumerate(mcolours.BASE_COLORS) if i < num_inputs]
+    colours = [mcolours.BASE_COLORS[name] for name in colour_keys]
     self.fig, self.ax = pp.subplots()
     self.inits = np.zeros(num_inputs)
     print(self.inits)
     self.max_range = max_range
     self.datas = [deque([0 for j in range(max_range)]) for i in range(num_inputs)]
-    self.lines = [Line2D(range(len(data)), data) for data in self.datas]
+    self.lines = [Line2D(range(len(data)), data, color=colours[i]) for i, data in enumerate(self.datas)]
     # self.ax.set_ylim(0, 1)
     self.ax.set_xlim(0, max_range)
     for line in self.lines:
