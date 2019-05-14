@@ -12,7 +12,7 @@ from matplotlib import colors as mcolours
 
 
 class LivePlot():
-  blitting = True
+  blitting = False
   def __init__(self, num_inputs, max_range=100):
     colour_keys = [key for i, key in enumerate(mcolours.BASE_COLORS) if i < num_inputs]
     colours = [mcolours.BASE_COLORS[name] for name in colour_keys]
@@ -21,11 +21,12 @@ class LivePlot():
     print(self.inits)
     self.max_range = max_range
     self.datas = [deque([0 for j in range(max_range)]) for i in range(num_inputs)]
-    self.lines = [Line2D(range(len(data)), data, color=colours[i]) for i, data in enumerate(self.datas)]
-    # self.ax.set_ylim(0, 1)
+    self.lines = [Line2D(range(len(data)), data, color=colours[i], label=str(i)) for i, data in enumerate(self.datas)]
+    self.ax.set_ylim(0, 1)
     self.ax.set_xlim(0, max_range)
     for line in self.lines:
       self.ax.add_line(line)
+    self.ax.legend()
 
   def update(self, t):
     self.inits = get_val(self.inits)
@@ -39,10 +40,10 @@ class LivePlot():
     for i, line in enumerate(self.lines):
       self.lines[i].set_data(range(len(self.datas[i])), self.datas[i])
 
-    if t % 50 == 0:
-      blitting = False
-    if t % 50 == 1:
-      blititng = True
+    if t % 10 == 0:
+      self.blitting = True
+    if t % 10 == 1:
+      self.blititng = False
     self.ax.relim()
     self.ax.autoscale_view(tight=True)
     
